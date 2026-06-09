@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Networked Mobile-Robot Service — Built From Scratch</title>
+<meta name="description" content="An original from-scratch build that exposes a wheeled mobile robot as a network service: ROS navigation, mapping and control, each packaged as a container you can run anywhere." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --accent:#0d9488; --accent-soft:#e6f6f4; --ink:#16201f; --muted:#5d6b69;
+    --line:#dfe5e3; --bg:#fbfcfb; --card:#ffffff;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);padding:.1em .4em;border-radius:4px;color:#0a6a73}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;letter-spacing:-.01em}
+  /* Header */
+  header.hero{padding:88px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 22px}
+  h1{font-size:clamp(2.6rem,6vw,4.1rem);margin:0 0 18px}
+  .lede{font-size:1.22rem;color:var(--muted);max-width:62ch;margin:0 0 28px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem}
+  .chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--muted);background:var(--card)}
+  /* Sections */
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+  h2{font-size:clamp(1.7rem,3.4vw,2.3rem);margin:0 0 20px}
+  h3{font-size:1.2rem;margin:0 0 6px}
+  p{margin:0 0 18px;max-width:68ch}
+  .muted{color:var(--muted)}
+  /* Stack grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px}
+  .tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .tool .t{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.04em;margin-bottom:8px}
+  .tool h3{font-size:1.05rem;font-family:var(--sans);font-weight:600;margin-bottom:6px}
+  .tool p{font-size:.92rem;color:var(--muted);margin:0}
+  /* Pipeline / modules */
+  ol.flow{counter-reset:s;list-style:none;padding:0;margin:24px 0 0}
+  ol.flow li{position:relative;padding:18px 0 18px 56px;border-top:1px solid var(--line)}
+  ol.flow li:before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:18px;font-family:var(--mono);font-size:.8rem;color:var(--accent);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:grid;place-items:center;background:var(--card)}
+  ol.flow li h3{font-family:var(--sans);font-size:1.02rem;font-weight:600;margin:0 0 4px}
+  ol.flow li p{margin:0;font-size:.93rem;color:var(--muted)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:.68rem;padding:2px 7px;border-radius:5px;margin-left:8px;vertical-align:middle}
+  .tag.on{background:#e6f7ec;color:#1c7a43}
+  .tag.off{background:#fdecea;color:#b23b2c}
+  /* Callout */
+  .callout{background:var(--accent-soft);border:1px solid #c9e9e4;border-radius:14px;padding:24px 26px;margin-top:8px}
+  .callout p:last-child{margin:0}
+  /* Reflection list */
+  ul.learn{list-style:none;padding:0;margin:8px 0 0}
+  ul.learn li{padding:14px 0 14px 30px;border-top:1px solid var(--line);position:relative;color:var(--muted);max-width:68ch}
+  ul.learn li:before{content:"→";position:absolute;left:0;color:var(--accent);font-family:var(--mono)}
+  ul.learn li b{color:var(--ink);font-weight:600}
+  /* Footer */
+  footer{padding:48px 0 80px}
+  .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  footer .fine{font-size:.8rem;color:var(--muted);margin-top:22px;text-align:center}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">From-Scratch Build · Mobile Robotics</p>
+    <h1>Networked Mobile-Robot Service</h1>
+    <p class="lede">A wheeled robot that drives itself around a building — turned into a network service you can start, map with, and steer from somewhere else entirely. Rebuilt from scratch to understand how robot autonomy, ROS and containers fit together.</p>
+    <div class="meta">
+      <span class="chip">ROS</span><span class="chip">Navigation</span><span class="chip">LiDAR + AMCL</span>
+      <span class="chip">Docker Compose</span><span class="chip">Simulation</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">What it is</p>
+    <h2>A robot you call like an API</h2>
+    <p>The robot is a small two-wheeled mobile base with a spinning laser scanner on top. Left to itself it can build a map of a room, work out where it is on that map, and drive to a goal while avoiding obstacles. The idea I wanted to learn here is to stop treating that robot as one monolithic program and instead expose it as a <b>service</b>: a set of independent pieces that any machine on the network can start, stop and talk to.</p>
+    <p>Every capability — the hardware drivers, the map server, the localisation, the path planner, the control loop — lives in its own container. Bring them up together and you have a self-driving robot. Move some of them onto another host and the same robot is now operated over the network, which is the whole point of the exercise.</p>
+    <div class="callout">
+      <p><b>The core idea I wanted to learn:</b> a robot's "intelligence" is just a handful of programs swapping messages. If you package each one as a container and let them find each other over the network, "the robot" stops being a single device and becomes a service that can run on the robot, on a nearby server, or in simulation — with no change to the code.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The stack</p>
+    <h2>Tools under the hood</h2>
+    <p class="muted">The point of this rebuild was the toolchain. Each of these was new to me; here is what each one actually does in the system.</p>
+    <div class="grid">
+      <div class="tool"><div class="t">middleware</div><h3>ROS</h3><p>The Robot Operating System — a messaging bus, not an OS. Nodes publish and subscribe to topics, so the driver, planner and controller cooperate without ever knowing about each other directly.</p></div>
+      <div class="tool"><div class="t">localisation</div><h3>AMCL</h3><p>Adaptive Monte-Carlo Localisation. It scatters thousands of guesses ("particles") about where the robot is, then uses laser readings to converge on the true pose against a known map.</p></div>
+      <div class="tool"><div class="t">perception</div><h3>RPLiDAR</h3><p>A spinning laser range-finder. It sweeps the room and returns distances all around the robot — the raw data that both mapping and obstacle avoidance depend on.</p></div>
+      <div class="tool"><div class="t">planning</div><h3>move_base + costmaps</h3><p>The navigation core. A global planner finds a route across the map; a local planner steers around things that weren't there before, using layered costmaps of free and blocked space.</p></div>
+      <div class="tool"><div class="t">control</div><h3>Kobuki base + Lua scripts</h3><p>The mobile base driver turns velocity commands into wheel motion. Small Lua scripts drive a mirrored model and offer keyboard tele-operation of the base.</p></div>
+      <div class="tool"><div class="t">packaging</div><h3>Docker + Compose</h3><p>Each module ships as its own image with a launch file. Compose wires them together, which is exactly what makes the same stack runnable on one host or split across many.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Architecture</p>
+    <h2>One robot, many services</h2>
+    <p>The service is assembled from a set of containers, each responsible for one slice of the robot's behaviour. Brought up together they form a complete self-driving stack; pulled apart, they become a robot operated over the network.</p>
+    <ol class="flow">
+      <li><h3>Core + Map Server <span class="tag on">live</span></h3><p>Hosts the ROS master (naming and discovery for every other node) and serves the saved floor map that localisation and planning are measured against.</p></li>
+      <li><h3>Robot Drivers <span class="tag on">live</span></h3><p>The hardware layer — the wheeled base and the laser scanner. A simulation variant stands in for the physical robot so the whole service can run without real hardware.</p></li>
+      <li><h3>Localisation Service <span class="tag on">live</span></h3><p>Runs AMCL so the robot always knows where it is on the map, and exposes that as a clean service other modules can request.</p></li>
+      <li><h3>Navigation <span class="tag on">live</span></h3><p>Global and local planning with costmaps and a logger node — turns "go to this point" into a safe, obstacle-aware trajectory.</p></li>
+      <li><h3>Control + Tele-op <span class="tag on">live</span></h3><p>The base controller plus Lua scripts for keyboard driving and a mirrored model, so an operator can take manual command.</p></li>
+      <li><h3>Single-Compose Bring-up <span class="tag off">future</span></h3><p>One Compose file to launch the entire service in a single command, with the namespace passed in as an environment variable. Left as future work in this build.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">How it runs</p>
+    <h2>From simulation to the network</h2>
+    <p>Deployment is the whole game. The build ships <b>launch scenarios</b> describing which modules come up and where they live:</p>
+    <ul class="learn">
+      <li><b>Simulation:</b> a virtual robot in a maze world, so the entire navigation stack can be exercised on one laptop with no hardware.</li>
+      <li><b>Single-host:</b> drivers, localisation, navigation and control all on one machine — the robot driving itself autonomously.</li>
+      <li><b>Networked:</b> control and planning split onto another host, so the robot is steered and routed remotely while its drivers stay on board — the "robot as a service" case.</li>
+    </ul>
+    <p class="muted" style="margin-top:18px">In my rebuild I focused on the simulated path: start the core and map server, attach the simulated drivers, bring up localisation and navigation, then send a goal and watch the planner drive the robot there — all coordinated through ROS launch files and per-module containers.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Reflection</p>
+    <h2>What rebuilding it taught me</h2>
+    <ul class="learn">
+      <li><b>ROS is plumbing, not magic.</b> Once you see it as a publish/subscribe bus, autonomous navigation becomes a set of small programs gossiping over topics — far less intimidating.</li>
+      <li><b>Localisation is a guessing game done well.</b> AMCL doesn't "know" where the robot is; it keeps a cloud of hypotheses and lets the laser data vote. Watching the particle cloud collapse onto the true pose finally made it click.</li>
+      <li><b>Containers turn "where does it run" into a config file.</b> The same modules, the same code, relocated from the robot to another host just by editing a launch scenario. That is the actual contribution of the project.</li>
+      <li><b>A service boundary is a design decision.</b> Choosing where to cut the robot into separate services — and what each one exposes — matters more than any single algorithm inside them.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="credit">
+      <div class="k">About this build</div>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn how mobile-robot autonomy, ROS navigation and containers fit together when a robot is exposed as a network service. Plain HTML/CSS, deployed on GitHub Pages.</p>
+    </div>
+    <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
+  </div>
+</footer>
+</body>
+</html>
